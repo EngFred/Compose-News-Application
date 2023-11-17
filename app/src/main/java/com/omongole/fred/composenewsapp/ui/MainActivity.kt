@@ -3,14 +3,15 @@ package com.omongole.fred.composenewsapp.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.omongole.fred.composenewsapp.ui.navigation.MobileNavigationGraph
 import com.omongole.fred.composenewsapp.ui.theme.ComposeNewsAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,8 +22,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         setContent {
+            val isSystemInDarkMode = isSystemInDarkTheme()
+            val systemController = rememberSystemUiController()
+            SideEffect {
+                systemController.setSystemBarsColor(
+                    color = Color.Transparent,
+                    darkIcons = !isSystemInDarkMode
+                )
+            }
             ComposeNewsAppTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

@@ -1,8 +1,12 @@
 package com.omongole.fred.composenewsapp.ui.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,23 +16,45 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import com.omongole.fred.composenewsapp.R
 import com.omongole.fred.composenewsapp.data.modal.Article
-import com.omongole.fred.composenewsapp.data.modal.NewsApiResponse
+import com.omongole.fred.composenewsapp.ui.theme.ComposeNewsAppTheme
 import com.omongole.fred.composenewsapp.ui.theme.Purple40
 
 
@@ -52,56 +78,6 @@ fun TextComposable(
 }
 
 @Composable
-fun PagerArticleComponent( it: Int, article: Article ) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(10.dp)
-    ) {
-        AsyncImage(
-            modifier = Modifier.height(270.dp),
-            model = article.urlToImage,
-            contentDescription = "",
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(id = R.drawable.placeholder),
-            error = painterResource(id = R.drawable.placeholder)
-        ) 
-        Spacer(modifier = Modifier.size(20.dp))
-        TextComposable(value = article.title ?: "", weight = FontWeight.Medium, size = 22.sp)
-        Spacer(modifier = Modifier.size(10.dp))
-        TextComposable(value = article.description ?: "")
-        Spacer(modifier = Modifier.weight(1f))
-        Row(
-            Modifier.fillMaxWidth()
-        ) {
-            Text(
-                modifier = Modifier
-                    .width(180.dp)
-                    .padding(8.dp),
-                text = article.author ?: "",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                ),
-                maxLines = 1
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                modifier = Modifier
-                    .width(130.dp)
-                    .padding(8.dp),
-                text = article.source?.name ?: "",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                ),
-                maxLines = 1
-            )
-        }
-    }
-}
-
-@Composable
 fun ErrorComposable() {
     Box(
         Modifier.fillMaxSize(),
@@ -111,6 +87,84 @@ fun ErrorComposable() {
             painter = painterResource(id = R.drawable.wrong),
             contentDescription = ""
         )
+    }
+}
+
+@Composable
+fun ArticleCard(
+    article: Article,
+    onCardClick: () -> Unit
+) {
+    Row(
+        Modifier
+            .clickable { onCardClick() }
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        AsyncImage(
+            modifier = Modifier
+                .size(96.dp)
+                .clip(MaterialTheme.shapes.medium),
+            model = article.urlToImage,
+            contentDescription = "",
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(id = R.drawable.placeholder),
+            error = painterResource(id = R.drawable.placeholder)
+        )
+        Column(
+            verticalArrangement = Arrangement.SpaceAround,
+            modifier= Modifier
+                .padding(horizontal = 3.dp)
+                .height(96.dp)
+        ) {
+            Text(
+               text = article.title ?: "",
+                style = TextStyle(
+                    fontWeight = FontWeight.Medium
+                ),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Black
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = article.source?.name ?: "",
+                    style = TextStyle(
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Icon( imageVector = Icons.Filled.CheckCircle, contentDescription = "")
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = article.publishedAt ?: "",
+                    style = TextStyle(
+                        fontWeight = FontWeight.Medium
+                    ),
+                    maxLines =1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Preview( showBackground = true )
+@Preview( showBackground = true, uiMode = UI_MODE_NIGHT_YES )
+@Composable
+fun ArticleCardPreview() {
+    ComposeNewsAppTheme {
+        ArticleCard(article = Article(
+            source = null,
+            author = null,
+            title = "News title",
+            description = null,
+            urlToImage = null,
+            publishedAt = "2hrs"
+        )) {
+        }
     }
 }
 
@@ -130,10 +184,115 @@ fun Loader() {
 }
 
 @Composable
-fun ArticlesList(articles: List<Article>) {
-    LazyColumn() {
-        items( articles) {
-            TextComposable(value = it.title ?: "")
+fun ArticlesList(
+    articles: LazyPagingItems<Article>,
+    onClick: ( Article ) -> Unit
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(10.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items( articles ) {
+            it?.let {
+                ArticleCard(
+                    article = it,
+                    onCardClick = { onClick(it) }
+                )
+            }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchWidget(
+    text: String,
+    onTextChange: (String) -> Unit,
+    onSearchClicked: (String) -> Unit,
+    onCloseClicked: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            .height(56.dp)
+            .semantics {
+                contentDescription = "SearchWidget"
+            },
+//        elevation = AppBarDefaults.TopAppBarElevation,
+//        color = MaterialTheme.colors.topAppBarBackgroundColor
+    ) {
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics {
+                    contentDescription = "TextField"
+                },
+            value = text,
+            onValueChange = { onTextChange(it) },
+            placeholder = {
+                Text(
+                    text = "Search news..."
+                )
+            },
+            shape = MaterialTheme.shapes.medium,
+            singleLine = true,
+            leadingIcon = {
+                IconButton(
+                    onClick = {}
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search Icon",
+                    )
+                }
+            },
+            trailingIcon = {
+                IconButton(
+                    modifier = Modifier
+                        .semantics {
+                            contentDescription = "CloseButton"
+                        },
+                    onClick = {
+                        if (text.isNotEmpty()) {
+                            onTextChange("")
+                        } else {
+                            onCloseClicked()
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close Icon",
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    onSearchClicked(text)
+                }
+            ),
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                errorIndicatorColor = Color.Transparent
+            )
+        )
+    }
+}
+
+@Composable
+@Preview
+fun SearchWidgetPreview() {
+    SearchWidget(
+        text = "Search",
+        onTextChange = {},
+        onSearchClicked = {},
+        onCloseClicked = {}
+    )
 }

@@ -46,11 +46,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesNewsRemoteSource( api: ApiInterface) : RemoteSource = RemoteSource(api)
-
-    @Provides
-    @Singleton
-    fun providesNewsRepository( source: RemoteSource ) : NewsRepositoryImpl = NewsRepositoryImpl(source )
+    fun providesNewsRepository( api: ApiInterface) : NewsRepositoryImpl = NewsRepositoryImpl( api )
 
     @Provides
     @Singleton

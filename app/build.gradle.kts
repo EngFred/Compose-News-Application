@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
+    id("kotlin-parcelize")
     id("com.google.dagger.hilt.android")
 }
 
@@ -95,6 +96,13 @@ dependencies {
 
     //coil
     implementation("io.coil-kt:coil-compose:2.2.0")
+
+    //systemUController
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.33.2-alpha")
+
+    //paging 3
+    implementation("androidx.paging:paging-runtime:3.1.1")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha16")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
