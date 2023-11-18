@@ -58,6 +58,7 @@ dependencies {
     val composeNavigationVersion = "2.7.5"
     val hiltComposeNavigationVersion = "1.1.0"
     val coroutinesVersion = "1.7.3"
+    val roomVersion = "2.4.3"
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
@@ -103,6 +104,13 @@ dependencies {
     //paging 3
     implementation("androidx.paging:paging-runtime:3.1.1")
     implementation("androidx.paging:paging-compose:1.0.0-alpha16")
+
+    //room
+    implementation ("androidx.room:room-runtime:$roomVersion")
+    implementation ("androidx.room:room-ktx:$roomVersion")
+//    implementation ("androidx.compose.runtime:runtime-livedata:1.2.1")
+//    annotationProcessor ("androidx.room:room-compiler:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

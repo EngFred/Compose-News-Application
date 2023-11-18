@@ -1,13 +1,12 @@
-package com.omongole.fred.composenewsapp.data.source
+package com.omongole.fred.composenewsapp.data.remote.source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.omongole.fred.composenewsapp.data.api.ApiInterface
+import com.omongole.fred.composenewsapp.data.remote.api.ApiInterface
 import com.omongole.fred.composenewsapp.data.modal.Article
-import com.omongole.fred.composenewsapp.utils.Constants.ITEMS_PER_PAGE
 import javax.inject.Inject
 
-class RemoteSource @Inject constructor (
+class GetNewsPagingSource @Inject constructor (
     private val api: ApiInterface,
     private val sources: String
 ): PagingSource<Int, Article>() {

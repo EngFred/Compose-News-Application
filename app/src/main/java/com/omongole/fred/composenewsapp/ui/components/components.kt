@@ -19,9 +19,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
@@ -56,7 +60,7 @@ import com.omongole.fred.composenewsapp.R
 import com.omongole.fred.composenewsapp.data.modal.Article
 import com.omongole.fred.composenewsapp.ui.theme.ComposeNewsAppTheme
 import com.omongole.fred.composenewsapp.ui.theme.Purple40
-
+import com.omongole.fred.composenewsapp.ui.viewModels.MainViewModel
 
 @Composable
 fun TextComposable(
@@ -118,7 +122,7 @@ fun ArticleCard(
                 .height(96.dp)
         ) {
             Text(
-               text = article.title ?: "",
+               text = article.title,
                 style = TextStyle(
                     fontWeight = FontWeight.Medium
                 ),
@@ -162,7 +166,8 @@ fun ArticleCardPreview() {
             title = "News title",
             description = null,
             urlToImage = null,
-            publishedAt = "2hrs"
+            publishedAt = "2hrs",
+            url = null
         )) {
         }
     }
@@ -206,11 +211,13 @@ fun ArticlesList(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchWidget(
-    text: String,
     onTextChange: (String) -> Unit,
     onSearchClicked: (String) -> Unit,
     onCloseClicked: () -> Unit
 ) {
+    val mainViewModel: MainViewModel = hiltViewModel()
+    val query = mainViewModel.uiState.value.searchQuery
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,8 +226,6 @@ fun SearchWidget(
             .semantics {
                 contentDescription = "SearchWidget"
             },
-//        elevation = AppBarDefaults.TopAppBarElevation,
-//        color = MaterialTheme.colors.topAppBarBackgroundColor
     ) {
         TextField(
             modifier = Modifier
@@ -228,8 +233,10 @@ fun SearchWidget(
                 .semantics {
                     contentDescription = "TextField"
                 },
-            value = text,
-            onValueChange = { onTextChange(it) },
+            value = query,
+            onValueChange = {
+                onTextChange(it)
+            },
             placeholder = {
                 Text(
                     text = "Search news..."
@@ -254,7 +261,7 @@ fun SearchWidget(
                             contentDescription = "CloseButton"
                         },
                     onClick = {
-                        if (text.isNotEmpty()) {
+                        if (query.isNotEmpty()) {
                             onTextChange("")
                         } else {
                             onCloseClicked()
@@ -272,7 +279,9 @@ fun SearchWidget(
             ),
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    onSearchClicked(text)
+                    if ( query.isNotEmpty() ) {
+                        onSearchClicked(query)
+                    }
                 }
             ),
             colors = TextFieldDefaults.textFieldColors(
@@ -286,13 +295,39 @@ fun SearchWidget(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
-fun SearchWidgetPreview() {
-    SearchWidget(
-        text = "Search",
-        onTextChange = {},
-        onSearchClicked = {},
-        onCloseClicked = {}
+fun DetailTopBar(
+    onBookMarkClick: () -> Unit,
+    onBackClick: () -> Unit,
+    onWebClick: () -> Unit,
+    onShareClick: () -> Unit,
+    bookMarkIcon: Int
+) {
+    TopAppBar(
+        title = {},
+        modifier = Modifier.fillMaxWidth(),
+        colors = TopAppBarDefaults.mediumTopAppBarColors(
+            containerColor = Color.Transparent,
+            actionIconContentColor = Color.Black,
+            navigationIconContentColor = Color.Black
+        ),
+        navigationIcon = {
+            IconButton(onClick = { onBackClick() }) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
+            }
+        },
+        actions = {
+            IconButton(onClick = { onBookMarkClick() }) {
+                Icon(painterResource(id = bookMarkIcon), contentDescription = "")
+            }
+            IconButton(onClick = { onShareClick() }) {
+                Icon(imageVector = Icons.Default.Share, contentDescription = "")
+            }
+            IconButton(onClick = { onWebClick() }) {
+                Icon(painterResource(id = R.drawable.browse), contentDescription = "", modifier = Modifier.size(42.dp))
+            }
+        }
+
     )
 }

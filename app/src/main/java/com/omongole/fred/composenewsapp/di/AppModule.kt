@@ -1,16 +1,23 @@
 package com.omongole.fred.composenewsapp.di
 
-import com.omongole.fred.composenewsapp.data.api.ApiInterface
-import com.omongole.fred.composenewsapp.data.repository.NewsRepository
-import com.omongole.fred.composenewsapp.data.source.RemoteSource
-import com.omongole.fred.composenewsapp.domain.NewsRepositoryImpl
-import com.omongole.fred.composenewsapp.domain.UseCases
+import android.content.Context
+import androidx.room.Room
+import com.omongole.fred.composenewsapp.data.local.ArticlesDao
+import com.omongole.fred.composenewsapp.data.local.ArticlesDatabase
+import com.omongole.fred.composenewsapp.data.local.ArticlesRepository
+import com.omongole.fred.composenewsapp.data.local.ArticlesTypeConverter
+import com.omongole.fred.composenewsapp.data.local.ArticlesUseCase
+import com.omongole.fred.composenewsapp.data.remote.api.ApiInterface
+import com.omongole.fred.composenewsapp.domain.local.ArticlesRepositoryImpl
+import com.omongole.fred.composenewsapp.domain.remote.NewsRepositoryImpl
+import com.omongole.fred.composenewsapp.domain.remote.UseCases
 import com.omongole.fred.composenewsapp.utils.Constants.API_BASE_URL
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -50,6 +57,28 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesUseCases( repository: NewsRepositoryImpl ) : UseCases = UseCases( repository )
+    fun providesUseCases( repository: NewsRepositoryImpl) : UseCases = UseCases( repository )
 
+    @Provides
+    @Singleton
+    fun providesRoomDatabaseInstance( @ApplicationContext context: Context ) : ArticlesDatabase =
+        Room.databaseBuilder( context, ArticlesDatabase::class.java, "Articles Database" )
+            .addTypeConverter( ArticlesTypeConverter() )
+            .fallbackToDestructiveMigration()
+            .build()
+
+    @Provides
+    @Singleton
+    fun providesArticleDaoInstance( articlesDatabase: ArticlesDatabase ) : ArticlesDao =
+        articlesDatabase.getDao
+
+    @Provides
+    @Singleton
+    fun providesArticlesLocalRepository( articlesDao: ArticlesDao ) :  ArticlesRepository =
+        ArticlesRepositoryImpl( articlesDao )
+
+    @Provides
+    @Singleton
+    fun providesLocalUseCase( localRepository: ArticlesRepositoryImpl ) : ArticlesUseCase =
+        ArticlesUseCase( localRepository )
 }
