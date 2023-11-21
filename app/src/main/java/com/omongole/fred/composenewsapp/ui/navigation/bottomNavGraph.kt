@@ -20,8 +20,11 @@ fun BottomNavGraph(
         route = Graph.BOTTOM_NAVIGATION
     ) {
         composable( route = Route.HomeScreen.destination ) {
-            HomeScreen(sharedViewModel = sharedViewModel, navController = navController, onSearchClicked = { searchQuery ->
+            HomeScreen( onSearchClicked = { searchQuery ->
                 navController.navigate(Route.SearchScreen.destination+"/${searchQuery}")
+            }, showArticleDetails = {
+                sharedViewModel.addArticle(it)
+                navController.navigate(Route.DetailScreen.destination)
             })
         }
         composable( route = Route.BookmarkScreen.destination ) {

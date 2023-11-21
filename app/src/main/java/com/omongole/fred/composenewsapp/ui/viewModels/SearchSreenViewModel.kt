@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.omongole.fred.composenewsapp.data.modal.Article
-import com.omongole.fred.composenewsapp.domain.remote.UseCases
+import com.omongole.fred.composenewsapp.domain.remote.usecases.SearchNewsUseCase
 import com.omongole.fred.composenewsapp.utils.Constants.SOURCES
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
-    private val useCases: UseCases
+    private val searchNewsUseCase: SearchNewsUseCase
 ) : ViewModel()  {
 
     private val _searchedNews = MutableStateFlow<PagingData<Article>>(PagingData.empty())
@@ -26,7 +26,7 @@ class SearchScreenViewModel @Inject constructor(
 
     fun searchNews(  searchQuery: String ) {
         viewModelScope.launch ( Dispatchers.IO ) {
-            useCases.invoke(  searchQuery, SOURCES ).cachedIn( viewModelScope ).collectLatest {
+            searchNewsUseCase( searchQuery, SOURCES ).cachedIn( viewModelScope ).collectLatest {
                 _searchedNews.value = it
             }
         }

@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.omongole.fred.composenewsapp.data.modal.Article
-import com.omongole.fred.composenewsapp.domain.remote.UseCases
+import com.omongole.fred.composenewsapp.domain.remote.usecases.GetNewsUseCase
 import com.omongole.fred.composenewsapp.utils.Constants.SOURCES
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val useCases: UseCases
+    private val getNewsUseCase: GetNewsUseCase
 ): ViewModel() {
 
     private val _news : MutableStateFlow<PagingData<Article>> = MutableStateFlow(PagingData.empty())
@@ -42,9 +42,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun getNews() {
+    fun getNews() {
         viewModelScope.launch( Dispatchers.IO ) {
-            useCases.invoke( SOURCES ).cachedIn(viewModelScope).collectLatest {
+            getNewsUseCase( SOURCES ).cachedIn( viewModelScope ).collectLatest {
                 _news.value = it
             }
         }

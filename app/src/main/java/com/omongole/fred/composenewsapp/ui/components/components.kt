@@ -1,12 +1,11 @@
 package com.omongole.fred.composenewsapp.ui.components
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -47,19 +48,19 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import com.omongole.fred.composenewsapp.R
 import com.omongole.fred.composenewsapp.data.modal.Article
-import com.omongole.fred.composenewsapp.ui.theme.ComposeNewsAppTheme
-import com.omongole.fred.composenewsapp.ui.theme.Purple40
 import com.omongole.fred.composenewsapp.ui.viewModels.MainViewModel
 
 @Composable
@@ -82,16 +83,42 @@ fun TextComposable(
 }
 
 @Composable
-fun ErrorComposable() {
+fun ErrorComposable(
+    errorMessage: String,
+    retry: () -> Unit
+) {
     Box(
-        Modifier.fillMaxSize(),
+        Modifier
+            .fillMaxSize()
+            .padding(start = 10.dp, end = 10.dp),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.wrong),
-            contentDescription = ""
-        )
+        Column {
+            Image(
+                painter = painterResource(id = R.drawable.sad_emoji),
+                contentDescription = "sad emoji",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .size(64.dp)
+            )
+            Text( text = errorMessage, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center )
+            Spacer(modifier = Modifier.size(30.dp))
+            OutlinedButton(
+                onClick = { retry() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 100.dp)
+            ) {
+                Text(text = "Retry")
+            }
+        }
     }
+}
+
+@Preview( showBackground = true )
+@Composable
+fun ErrorComposePrev() {
+    ErrorComposable(errorMessage = "Error", retry = {})
 }
 
 @Composable
@@ -124,11 +151,10 @@ fun ArticleCard(
             Text(
                text = article.title,
                 style = TextStyle(
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 ),
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                color = Color.Black
+                overflow = TextOverflow.Ellipsis
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -155,23 +181,6 @@ fun ArticleCard(
     }
 }
 
-@Preview( showBackground = true )
-@Preview( showBackground = true, uiMode = UI_MODE_NIGHT_YES )
-@Composable
-fun ArticleCardPreview() {
-    ComposeNewsAppTheme {
-        ArticleCard(article = Article(
-            source = null,
-            author = null,
-            title = "News title",
-            description = null,
-            urlToImage = null,
-            publishedAt = "2hrs",
-            url = null
-        )) {
-        }
-    }
-}
 
 @Composable
 fun Loader() {
@@ -183,7 +192,7 @@ fun Loader() {
             modifier = Modifier
                 .size(60.dp)
                 .padding(10.dp),
-            color = Purple40
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -191,18 +200,50 @@ fun Loader() {
 @Composable
 fun ArticlesList(
     articles: LazyPagingItems<Article>,
-    onClick: ( Article ) -> Unit
+    onArticleClick: ( Article ) -> Unit
 ) {
-    LazyColumn(
-        contentPadding = PaddingValues(10.dp),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items( articles ) {
+    LazyColumn() {
+        items(articles){
             it?.let {
                 ArticleCard(
                     article = it,
-                    onCardClick = { onClick(it) }
+                    onCardClick = { onArticleClick(it) }
                 )
+            }
+        }
+        articles.apply {
+            when (loadState.append) {
+                is LoadState.Loading -> { //loading next page
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(40.dp),
+                                strokeWidth = 5.dp
+                            )
+                            Spacer(modifier = Modifier.size(4.dp))
+                        }
+                    }
+                }
+                is LoadState.Error -> {
+                    val error = articles.loadState.append as LoadState.Error
+                    item {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(start = 10.dp, end = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text( text = "${error.error.message}", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center )
+                            Spacer(modifier = Modifier.size(4.dp))
+                        }
+                    }
+                }
+                else -> Unit
             }
         }
     }
@@ -287,8 +328,8 @@ fun SearchWidget(
             colors = TextFieldDefaults.textFieldColors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                textColor = Color.Black,
-                cursorColor = Color.Black,
+                textColor = if( isSystemInDarkTheme() ) Color.White else Color.Black,
+                cursorColor = if( isSystemInDarkTheme() ) Color.White else Color.Black,
                 errorIndicatorColor = Color.Transparent
             )
         )
@@ -309,8 +350,8 @@ fun DetailTopBar(
         modifier = Modifier.fillMaxWidth(),
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = Color.Transparent,
-            actionIconContentColor = Color.Black,
-            navigationIconContentColor = Color.Black
+            actionIconContentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+            navigationIconContentColor = if (isSystemInDarkTheme()) Color.White else Color.Black
         ),
         navigationIcon = {
             IconButton(onClick = { onBackClick() }) {

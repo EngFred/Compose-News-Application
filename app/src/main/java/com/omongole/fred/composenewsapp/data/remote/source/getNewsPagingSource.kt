@@ -4,6 +4,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.omongole.fred.composenewsapp.data.remote.api.ApiInterface
 import com.omongole.fred.composenewsapp.data.modal.Article
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 class GetNewsPagingSource @Inject constructor (
@@ -21,12 +23,24 @@ class GetNewsPagingSource @Inject constructor (
 
             LoadResult.Page(
                 data = apiResponse.articles.distinctBy { it.title } ,
-                prevKey = if ( currentPage == 1) null else currentPage - 1,
+                prevKey = if ( currentPage == 1 ) null else currentPage - 1,
                 nextKey = if ( endOfPaginationReached ) null else currentPage + 1
             )
 
         } catch ( ex: Exception ) {
-            LoadResult.Error(ex)
+            val error: String
+            when( ex ) {
+                is UnknownHostException -> {
+                    error = "No Internet Connection"
+                }
+                is SocketTimeoutException -> {
+                    error = "Request Timed out! Your internet connection could be slow."
+                }
+                else -> {
+                    error = ex.toString()
+                }
+            }
+            LoadResult.Error(Throwable(error))
         }
     }
 }

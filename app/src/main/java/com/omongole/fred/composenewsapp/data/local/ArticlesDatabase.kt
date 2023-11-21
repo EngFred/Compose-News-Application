@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.omongole.fred.composenewsapp.data.modal.Article
 
-@Database( entities = [Article::class], version = 1, exportSchema = false )
+@Database( entities = [Article::class], version = 2, exportSchema = false )
 @TypeConverters(ArticlesTypeConverter::class)
 abstract class ArticlesDatabase : RoomDatabase() {
     abstract val getDao : ArticlesDao

@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.omongole.fred.composenewsapp.data.local.ArticlesUseCase
 import com.omongole.fred.composenewsapp.data.modal.Article
+import com.omongole.fred.composenewsapp.domain.local.usecases.DeleteArticleUseCase
+import com.omongole.fred.composenewsapp.domain.local.usecases.GetArticleUseCase
+import com.omongole.fred.composenewsapp.domain.local.usecases.SaveArticleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,7 +16,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor(
-    private val localUseCase: ArticlesUseCase
+    private val getArticleUseCase: GetArticleUseCase,
+    private val saveArticleUseCase: SaveArticleUseCase,
+    private val deleteArticleUseCase: DeleteArticleUseCase
 ):  ViewModel() {
 
     var sideEffect by mutableStateOf<String?>(null)
@@ -26,16 +30,16 @@ class DetailScreenViewModel @Inject constructor(
         when( event ) {
             is DetailScreenEvent.SaveOrDeleteArticle -> {
                 viewModelScope.launch ( Dispatchers.IO ) {
-                    val article = localUseCase.getArticle( event.article.url!! )
+                    val article = getArticleUseCase( event.article.url!! )
                     if ( article == null ) {
                         viewModelScope.launch ( Dispatchers.IO ) {
-                            localUseCase.saveArticleUseCase( event.article)
+                            saveArticleUseCase( event.article )
                             sideEffect = "Article saved!"
                         }
                         articleAlreadySaved.value = false
                     }else {
                         viewModelScope.launch ( Dispatchers.IO ) {
-                            localUseCase.deleteArticleUseCase( article )
+                            deleteArticleUseCase( article )
                             sideEffect = "Article removed!"
                         }
                         articleAlreadySaved.value = true

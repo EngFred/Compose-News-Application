@@ -19,6 +19,7 @@ data class Article(
     @PrimaryKey
     val title: String,
     val description: String?,
+    val content : String?,
     val urlToImage: String?,
     val url: String?,
     val publishedAt: String?

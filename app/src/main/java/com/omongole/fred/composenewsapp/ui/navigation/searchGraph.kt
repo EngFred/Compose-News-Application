@@ -9,7 +9,6 @@ import androidx.navigation.navigation
 import com.omongole.fred.composenewsapp.ui.screens.SearchScreen
 import com.omongole.fred.composenewsapp.ui.viewModels.SharedViewModel
 
-
 fun NavGraphBuilder.searchGraph(
     navController: NavHostController,
     sharedViewModel: SharedViewModel
@@ -24,7 +23,10 @@ fun NavGraphBuilder.searchGraph(
             )
         ) {
             val searchQuery = it.arguments?.getString("query")
-            SearchScreen( searchQuery = searchQuery, sharedViewModel = sharedViewModel, navController = navController )
+            SearchScreen( searchQuery = searchQuery, showArticleDetails = { article ->
+                sharedViewModel.addArticle(article)
+                navController.navigate(Route.DetailScreen.destination)
+            })
         }
     }
 }

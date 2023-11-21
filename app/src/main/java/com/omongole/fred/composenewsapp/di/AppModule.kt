@@ -6,11 +6,10 @@ import com.omongole.fred.composenewsapp.data.local.ArticlesDao
 import com.omongole.fred.composenewsapp.data.local.ArticlesDatabase
 import com.omongole.fred.composenewsapp.data.local.ArticlesRepository
 import com.omongole.fred.composenewsapp.data.local.ArticlesTypeConverter
-import com.omongole.fred.composenewsapp.data.local.ArticlesUseCase
 import com.omongole.fred.composenewsapp.data.remote.api.ApiInterface
+import com.omongole.fred.composenewsapp.data.remote.repository.NewsRepository
 import com.omongole.fred.composenewsapp.domain.local.ArticlesRepositoryImpl
 import com.omongole.fred.composenewsapp.domain.remote.NewsRepositoryImpl
-import com.omongole.fred.composenewsapp.domain.remote.UseCases
 import com.omongole.fred.composenewsapp.utils.Constants.API_BASE_URL
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -57,10 +56,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesUseCases( repository: NewsRepositoryImpl) : UseCases = UseCases( repository )
-
-    @Provides
-    @Singleton
     fun providesRoomDatabaseInstance( @ApplicationContext context: Context ) : ArticlesDatabase =
         Room.databaseBuilder( context, ArticlesDatabase::class.java, "Articles Database" )
             .addTypeConverter( ArticlesTypeConverter() )
@@ -79,6 +74,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesLocalUseCase( localRepository: ArticlesRepositoryImpl ) : ArticlesUseCase =
-        ArticlesUseCase( localRepository )
+    fun providesRemoteRepository( api: ApiInterface ) :  NewsRepository =
+        NewsRepositoryImpl( api )
+
 }

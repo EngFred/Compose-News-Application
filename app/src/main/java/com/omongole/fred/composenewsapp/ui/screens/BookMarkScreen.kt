@@ -1,9 +1,9 @@
 package com.omongole.fred.composenewsapp.ui.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,17 +38,16 @@ fun BookMarkScreen(
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(10.dp)
     ) {
-        Text( text = "BookMarks",
-            style = MaterialTheme.typography.
-            displayMedium.copy(
+        Text(
+            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
+            text = "BookMarks",
+            style = MaterialTheme.typography.displaySmall.copy(
                 fontWeight = FontWeight.Bold
             )
         )
         Spacer(modifier = Modifier.size(17.dp))
         LazyColumn(
-            contentPadding = PaddingValues(7.dp),
             modifier = Modifier.fillMaxSize()
         ) {
             items( articles ){

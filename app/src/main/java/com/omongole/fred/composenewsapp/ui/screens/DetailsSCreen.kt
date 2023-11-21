@@ -6,7 +6,6 @@ import android.content.Intent.ACTION_VIEW
 import android.content.Intent.EXTRA_TEXT
 import android.net.Uri
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,20 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,13 +43,6 @@ fun DetailScreen(
     val article = sharedViewModel.article
 
     val context = LocalContext.current
-
-    val readMoreText = buildAnnotatedString {
-        withStyle( style = SpanStyle( color = Color.Blue)){
-            pushStringAnnotation( tag = "Read more", annotation = "Read more")
-            append( "Read more" )
-        }
-    }
 
     if ( detailScreenViewModel.sideEffect != null ) {
         Toast.makeText(LocalContext.current, detailScreenViewModel.sideEffect, Toast.LENGTH_SHORT).show()
@@ -90,7 +77,7 @@ fun DetailScreen(
                     }
                 }
             },
-            bookMarkIcon = if ( detailScreenViewModel.articleAlreadySaved.value ) R.drawable.bookmark else R.drawable.bookmark_boader
+            bookMarkIcon = if ( !detailScreenViewModel.articleAlreadySaved.value ) R.drawable.bookmark else R.drawable.bookmark_boader
         )
         AsyncImage(
             modifier = Modifier.height(280.dp),
@@ -104,19 +91,6 @@ fun DetailScreen(
         TextComposable(value = article!!.title, weight = FontWeight.Medium, size = 22.sp)
         Spacer(modifier = Modifier.size(10.dp))
         TextComposable(value = article.description ?: "")
-        Spacer(modifier = Modifier.size(10.dp))
-        Box( modifier = Modifier
-            .fillMaxWidth()
-            .padding(18.dp), contentAlignment = Alignment.CenterEnd ) {
-            ClickableText( text = readMoreText, onClick = {
-                Intent(ACTION_VIEW).also {
-                    it.data = Uri.parse(article.url)
-                    if ( it.resolveActivity(context.packageManager) != null ) {
-                        context.startActivity(it)
-                    }
-                }
-            })
-        }
         Spacer(modifier = Modifier.weight(1f))
         Row(
             Modifier.fillMaxWidth()
@@ -130,7 +104,8 @@ fun DetailScreen(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                 ),
-                maxLines = 1
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
@@ -142,7 +117,8 @@ fun DetailScreen(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                 ),
-                maxLines = 1
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
