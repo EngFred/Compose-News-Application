@@ -1,4 +1,4 @@
-package com.omongole.fred.composenewsapp.ui.screens
+package com.omongole.fred.composenewsapp.ui.screens.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,18 +12,16 @@ import com.omongole.fred.composenewsapp.ui.components.ArticlesList
 import com.omongole.fred.composenewsapp.ui.components.ErrorComposable
 import com.omongole.fred.composenewsapp.ui.components.Loader
 import com.omongole.fred.composenewsapp.ui.components.SearchWidget
-import com.omongole.fred.composenewsapp.ui.viewModels.HomeScreenEvent
-import com.omongole.fred.composenewsapp.ui.viewModels.MainViewModel
 
 const val TAG = "HOME_SCREEN"
 
 @Composable
 fun HomeScreen(
-    mainViewModel: MainViewModel = hiltViewModel(),
+    homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
     onSearchClicked: (String?) -> Unit,
     showArticleDetails: (Article) -> Unit
 ) {
-    val articles = mainViewModel.news.collectAsLazyPagingItems()
+    val articles = homeScreenViewModel.news.collectAsLazyPagingItems()
 
     Column( modifier = Modifier.fillMaxSize()) {
         when (articles.loadState.refresh) {
@@ -31,13 +29,13 @@ fun HomeScreen(
             is LoadState.Error -> {
                 val error = articles.loadState.refresh as LoadState.Error
                 ErrorComposable(errorMessage = "${error.error.message}!", retry = {
-                    mainViewModel.getNews()
+                    homeScreenViewModel.getNews()
                 })
             }
             else -> {
                 SearchWidget(
                     onTextChange = {
-                        mainViewModel.onEvent(HomeScreenEvent.SearchQueryChanged(it))
+                        homeScreenViewModel.onEvent(HomeScreenEvent.SearchQueryChanged(it))
                     },
                     onSearchClicked = {
                         onSearchClicked(it)

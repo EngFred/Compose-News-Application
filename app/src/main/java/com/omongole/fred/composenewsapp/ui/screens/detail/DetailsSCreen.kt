@@ -1,4 +1,4 @@
-package com.omongole.fred.composenewsapp.ui.screens
+package com.omongole.fred.composenewsapp.ui.screens.detail
 
 import android.content.Intent
 import android.content.Intent.ACTION_SEND
@@ -27,18 +27,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.omongole.fred.composenewsapp.R
 import com.omongole.fred.composenewsapp.ui.components.DetailTopBar
 import com.omongole.fred.composenewsapp.ui.components.TextComposable
-import com.omongole.fred.composenewsapp.ui.viewModels.DetailScreenEvent
-import com.omongole.fred.composenewsapp.ui.viewModels.DetailScreenViewModel
 import com.omongole.fred.composenewsapp.ui.viewModels.SharedViewModel
 
 @Composable
 fun DetailScreen(
     sharedViewModel: SharedViewModel,
-    detailScreenViewModel: DetailScreenViewModel = hiltViewModel()
+    detailScreenViewModel: DetailScreenViewModel = hiltViewModel(),
+    navHostController: NavHostController
 ) {
     val article = sharedViewModel.article
 
@@ -58,7 +58,9 @@ fun DetailScreen(
             onBookMarkClick = {
                 detailScreenViewModel.onEvent(DetailScreenEvent.SaveOrDeleteArticle(article!!))
             },
-            onBackClick = {},
+            onBackClick = {
+                navHostController.navigateUp()
+            },
             onWebClick = {
                 Intent(ACTION_VIEW).also {
                     it.data = Uri.parse(article?.url)

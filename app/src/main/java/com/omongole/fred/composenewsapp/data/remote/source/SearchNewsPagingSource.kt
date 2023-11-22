@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.omongole.fred.composenewsapp.data.remote.api.ApiInterface
 import com.omongole.fred.composenewsapp.data.modal.Article
+import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
@@ -34,6 +35,9 @@ class SearchNewsPagingSource @Inject constructor(
                 }
                 is SocketTimeoutException -> {
                     error = "Request Timed out! Your internet connection could be slow."
+                }
+                is ConnectException -> {
+                    error = "No Internet Connection"
                 }
                 else -> {
                     error = ex.toString()

@@ -1,4 +1,4 @@
-package com.omongole.fred.composenewsapp.ui.viewModels
+package com.omongole.fred.composenewsapp.ui.screens.home
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class HomeScreenViewModel @Inject constructor(
     private val getNewsUseCase: GetNewsUseCase
 ): ViewModel() {
 
@@ -31,7 +31,7 @@ class MainViewModel @Inject constructor(
         getNews()
     }
 
-    fun onEvent( event: HomeScreenEvent ) {
+    fun onEvent( event: HomeScreenEvent) {
         when( event ) {
             is HomeScreenEvent.SearchQueryChanged -> {
                 uiState.value = uiState.value.copy(

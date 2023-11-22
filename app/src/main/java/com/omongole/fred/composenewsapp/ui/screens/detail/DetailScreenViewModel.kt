@@ -1,4 +1,4 @@
-package com.omongole.fred.composenewsapp.ui.viewModels
+package com.omongole.fred.composenewsapp.ui.screens.detail
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +26,7 @@ class DetailScreenViewModel @Inject constructor(
 
     val articleAlreadySaved = mutableStateOf(false)
 
-    fun onEvent( event: DetailScreenEvent ) {
+    fun onEvent( event: DetailScreenEvent) {
         when( event ) {
             is DetailScreenEvent.SaveOrDeleteArticle -> {
                 viewModelScope.launch ( Dispatchers.IO ) {

@@ -61,7 +61,7 @@ import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import com.omongole.fred.composenewsapp.R
 import com.omongole.fred.composenewsapp.data.modal.Article
-import com.omongole.fred.composenewsapp.ui.viewModels.MainViewModel
+import com.omongole.fred.composenewsapp.ui.screens.home.HomeScreenViewModel
 
 @Composable
 fun TextComposable(
@@ -256,8 +256,8 @@ fun SearchWidget(
     onSearchClicked: (String) -> Unit,
     onCloseClicked: () -> Unit
 ) {
-    val mainViewModel: MainViewModel = hiltViewModel()
-    val query = mainViewModel.uiState.value.searchQuery
+    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+    val query = homeScreenViewModel.uiState.value.searchQuery
 
     Surface(
         modifier = Modifier

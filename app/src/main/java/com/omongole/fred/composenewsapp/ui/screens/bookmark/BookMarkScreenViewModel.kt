@@ -1,4 +1,4 @@
-package com.omongole.fred.composenewsapp.ui.viewModels
+package com.omongole.fred.composenewsapp.ui.screens.bookmark
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
