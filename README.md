@@ -5,7 +5,6 @@ NewsFlash is a modern Android application that fetches and displays the latest n
 ## Features
 
 - **Latest News:** Fetches and displays the latest news articles from the News API.
-- **Categories:** Browse news articles by different categories (e.g., technology, sports, health).
 - **Search Functionality:** Search for specific news articles based on keywords.
 - **Bookmarks:** Add articles to your bookmarks for easy access later.
 - **Detailed View:** View detailed information about a news article, including the full content.
